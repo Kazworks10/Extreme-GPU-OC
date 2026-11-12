@@ -12,6 +12,9 @@ add_library(gpuoc_core STATIC
   backends/mock/mock_backend.cpp
   backends/dry_run_backend.cpp
   backends/nvidia/nvidia_backend.cpp
+  backends/nvidia/nvidia_status.cpp
+  backends/nvidia/nvml_loader.cpp
+  backends/nvidia/nvapi_loader.cpp
   # bench
   bench/kernel_reference.cpp
   bench/vulkan_kernel.cpp
@@ -64,6 +67,7 @@ endif()
 
 if(WIN32)
   target_link_libraries(gpuoc_core PUBLIC shell32 ole32 advapi32 version)
+  target_link_libraries(gpuoc_core PRIVATE gpuoc_nvapi_headers)
 endif()
 
 # ---- executables ---------------------------------------------------------------

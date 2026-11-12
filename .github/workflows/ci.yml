@@ -9,14 +9,16 @@ permissions:
   contents: read
 
 jobs:
+  # windows-latest: MSVC from whichever Visual Studio the image ships
+  # (CMake picks the newest installed instance).
   windows-msvc:
-    name: Windows / MSVC (Release)
+    name: Windows latest / MSVC (Release)
     runs-on: windows-latest
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - name: Configure
-        run: cmake -S . -B build -G "Visual Studio 17 2022" -A x64
+        run: cmake -S . -B build -A x64
       - name: Build
         run: cmake --build build --config Release --parallel
       - name: Test (no hardware)
@@ -29,14 +31,28 @@ jobs:
           ./build/bin/Release/gpuoc.exe --backend mock list
           ./build/bin/Release/gpuoc.exe doctor; if ($LASTEXITCODE -notin 0,2) { exit 1 } else { exit 0 }
 
+  # The exact commands from the definition of done (Visual Studio 2022).
+  windows-vs2022:
+    name: Windows 2022 / Visual Studio 17 2022 (Release)
+    runs-on: windows-2022
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -S . -B build -G "Visual Studio 17 2022" -A x64
+      - name: Build
+        run: cmake --build build --config Release
+      - name: Test (no hardware)
+        run: ctest --test-dir build -C Release --output-on-failure --timeout 900
+
   windows-clang-cl:
-    name: Windows / clang-cl (Release)
+    name: Windows latest / clang-cl (Release)
     runs-on: windows-latest
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - name: Configure
-        run: cmake -S . -B build -G "Visual Studio 17 2022" -A x64 -T ClangCL
+        run: cmake -S . -B build -A x64 -T ClangCL
       - name: Build
         run: cmake --build build --config Release --parallel
       - name: Test (no hardware)

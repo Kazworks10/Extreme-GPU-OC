@@ -13,6 +13,8 @@ add_executable(gpuoc_tests
   unit/test_service.cpp
   unit/test_profiles.cpp
   integration/test_cli.cpp
+  unit/test_nvidia.cpp
+  hw/test_hardware.cpp
 )
 target_link_libraries(gpuoc_tests PRIVATE gpuoc_core GTest::gtest)
 target_include_directories(gpuoc_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})

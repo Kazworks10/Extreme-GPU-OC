@@ -21,7 +21,8 @@ FetchContent_Declare(nlohmann_json
 # (nvml.dll is loaded at runtime).
 FetchContent_Declare(nvml_headers
   URL      https://developer.download.nvidia.com/compute/cuda/redist/cuda_nvml_dev/windows-x86_64/cuda_nvml_dev-windows-x86_64-12.6.77-archive.zip
-  URL_HASH SHA256=45f2466ff154a44701388a90913b7d1c4c0ec591f0ec33b3d30464d5c2ffbe8d)
+  URL_HASH SHA256=45f2466ff154a44701388a90913b7d1c4c0ec591f0ec33b3d30464d5c2ffbe8d
+  DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
 
 set(_gpuoc_deps tomlplusplus nlohmann_json nvml_headers)
 
