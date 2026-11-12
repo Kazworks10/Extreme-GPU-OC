@@ -47,6 +47,16 @@ jobs:
         run: cmake --build build --config Release
       - name: Test (no hardware)
         run: ctest --test-dir build -C Release --output-on-failure --timeout 900
+      - name: Package
+        shell: pwsh
+        run: ./tools/package.ps1 -Bin build/bin/Release -Out dist
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: extreme-gpu-oc-win-x64
+          path: dist/*.zip
+          if-no-files-found: error
+          retention-days: 30
 
   windows-clang-cl:
     name: Windows latest / clang-cl (Release)

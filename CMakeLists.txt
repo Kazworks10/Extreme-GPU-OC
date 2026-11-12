@@ -13,6 +13,11 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 option(GPUOC_BUILD_TESTS "Build the GoogleTest suite" ON)
 option(GPUOC_WERROR "Treat warnings as errors" ON)
 option(GPUOC_BUILD_VULKAN "Build the Vulkan compute workload" ON)
+option(GPUOC_STATIC_RUNTIME "MSVC: link the C++ runtime statically (no VC++ redistributable needed)" ON)
+
+if(MSVC AND GPUOC_STATIC_RUNTIME)
+  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
 
 if(NOT WIN32)
   message(STATUS "gpuoc: non-Windows host build (development only; see docs/DECISIONS.md D-001)")

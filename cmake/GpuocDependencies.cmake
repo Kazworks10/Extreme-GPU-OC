@@ -46,7 +46,12 @@ endif()
 
 # --- GoogleTest v1.15.2 -------------------------------------------------------
 if(GPUOC_BUILD_TESTS)
-  set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+  # GoogleTest must use the same C++ runtime as everything else.
+  if(MSVC AND GPUOC_STATIC_RUNTIME)
+    set(gtest_force_shared_crt OFF CACHE BOOL "" FORCE)
+  else()
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+  endif()
   set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
   set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
   FetchContent_Declare(googletest
