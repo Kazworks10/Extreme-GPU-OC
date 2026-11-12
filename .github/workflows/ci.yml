@@ -1,0 +1,58 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows-msvc:
+    name: Windows / MSVC (Release)
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -S . -B build -G "Visual Studio 17 2022" -A x64
+      - name: Build
+        run: cmake --build build --config Release --parallel
+      - name: Test (no hardware)
+        run: ctest --test-dir build -C Release --output-on-failure --timeout 900
+      - name: Smoke (CLI on the mock backend)
+        shell: pwsh
+        run: |
+          $env:GPUOC_PROGRAMDATA = "$env:RUNNER_TEMP\pd"
+          $env:GPUOC_APPDATA = "$env:RUNNER_TEMP\ad"
+          ./build/bin/Release/gpuoc.exe --backend mock list
+          ./build/bin/Release/gpuoc.exe doctor; if ($LASTEXITCODE -notin 0,2) { exit 1 } else { exit 0 }
+
+  windows-clang-cl:
+    name: Windows / clang-cl (Release)
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -S . -B build -G "Visual Studio 17 2022" -A x64 -T ClangCL
+      - name: Build
+        run: cmake --build build --config Release --parallel
+      - name: Test (no hardware)
+        run: ctest --test-dir build -C Release --output-on-failure --timeout 900
+
+  linux-host:
+    name: Linux host build (development only)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Vulkan software driver
+        run: sudo apt-get update && sudo apt-get install -y ninja-build mesa-vulkan-drivers libvulkan1
+      - name: Configure
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build build --parallel
+      - name: Test
+        run: ctest --test-dir build --output-on-failure --timeout 900
