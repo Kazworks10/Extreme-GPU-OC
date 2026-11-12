@@ -129,7 +129,7 @@ Nothing in this repository has been run on a real NVIDIA GPU. The development en
 - Voltage control through the P-state 2.0 base-voltage delta. Most current GPUs do not expose it, and `gpuoc` then reports it unsupported.
 - Matching Vulkan devices to NVML GPUs by UUID.
 - The Windows Event Log query and the event IDs used for driver failures (`nvlddmkm` 13, 14, 153 and `Display` 4101). Verify them on your system ([docs/WINDOWS.md](docs/WINDOWS.md)).
-- The service under the real Service Control Manager: install, delayed auto-start, failure actions, preshutdown, and the pipe ACL. The service logic is tested, but only through its portable core and under Wine.
+- Preshutdown, failure actions (restart after a crash or watchdog exit), and delayed auto-start under the real Service Control Manager. CI does install, start, drive over the pipe, and stop the real service, but only on the simulated GPU in dry-run mode.
 - Thermal behaviour, how long tuning really takes, and whether the default search steps suit any particular card.
 
 ## Documentation

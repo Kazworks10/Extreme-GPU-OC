@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <nlohmann/json.hpp>
+#include <thread>
 
 #include "platform/paths.hpp"
 #include "platform/process.hpp"
@@ -106,6 +107,28 @@ TEST_F(Cli, InvalidProfileFileIsReported) {
   auto errors = nlohmann::json::parse(l.out)["errors"];
   ASSERT_EQ(errors.size(), 1u);
   EXPECT_NE(errors[0].get<std::string>().find("core_offset_mhz"), std::string::npos);
+}
+
+// Ctrl+C while `gpuoc set` holds settings: stock is restored before exit.
+TEST_F(Cli, CtrlCRestoresStock) {
+  const std::string hw = dir_.str("hw.json");
+  test::ScopedEnv state("GPUOC_MOCK_STATE", hw);
+  auto child = platform::ChildProcess::spawn({GPUOC_CLI_PATH, "--backend", "mock", "set", "--gpu", "0", "--core", "+45"});
+  ASSERT_TRUE(child.ok());
+  auto core_now = [&]() -> int {
+    auto text = platform::read_file(platform::u8path(hw));
+    if (!text) return -1;
+    auto j = nlohmann::json::parse(text.value(), nullptr, false);
+    return j.is_discarded() ? -1 : j["gpus"][0].value("core", -1);
+  };
+  for (int i = 0; i < 200 && core_now() != 45; ++i) std::this_thread::sleep_for(std::chrono::milliseconds(25));
+  ASSERT_EQ(core_now(), 45) << "settings applied and held";
+  auto sent = child.value()->interrupt();
+  if (!sent) GTEST_SKIP() << sent.error().message;  // Windows: no shared console in tests
+  auto e = child.value()->wait(Ms(10000));
+  ASSERT_TRUE(e.has_value());
+  EXPECT_EQ(e->code, 0);
+  EXPECT_EQ(core_now(), 0) << "Ctrl+C restored stock";
 }
 
 TEST_F(Cli, DoctorProducesJson) {

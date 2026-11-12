@@ -231,6 +231,10 @@ void ChildProcess::kill() {
 
 bool ChildProcess::running() { return WaitForSingleObject(impl_->process, 0) == WAIT_TIMEOUT; }
 
+Result<void> ChildProcess::interrupt() {
+  return make_error(ErrorCode::Unsupported, "console control events need a shared console");
+}
+
 #else  // POSIX (development hosts)
 
 struct ChildProcess::Impl {
@@ -353,6 +357,12 @@ void ChildProcess::kill() {
 }
 
 bool ChildProcess::running() { return !wait(Ms(0)).has_value(); }
+
+Result<void> ChildProcess::interrupt() {
+  if (impl_->pid <= 0 || impl_->exit) return make_error(ErrorCode::NotFound, "process not running");
+  if (::kill(-impl_->pid, SIGINT) != 0) return make_error(ErrorCode::IoError, "kill(SIGINT) failed");
+  return success();
+}
 
 #endif
 

@@ -37,6 +37,10 @@ class ChildProcess {
   // Wait for exit. nullopt if still running after the timeout.
   std::optional<ExitInfo> wait(Ms timeout);
   void kill();
+  // Ask the child to stop as if Ctrl+C was pressed (POSIX: SIGINT to its
+  // process group). Windows children run without a console, so this
+  // returns Unsupported there.
+  Result<void> interrupt();
   [[nodiscard]] bool running();
 
   struct Impl;

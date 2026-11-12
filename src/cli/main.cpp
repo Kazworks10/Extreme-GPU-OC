@@ -857,6 +857,9 @@ class Cli {
 #endif
       std::string args;
       if (auto c = a_.get("config")) args = "--config " + platform::quote_windows_arg(*c);
+      // Optional pass-through, e.g. a dry-run service on the simulated GPU.
+      if (auto b = a_.get("backend")) args += (args.empty() ? "" : " ") + std::string("--backend ") + platform::quote_windows_arg(*b);
+      if (a_.has("dry-run")) args += (args.empty() ? "" : " ") + std::string("--dry-run");
       r = platform::install_service(exe, args);
     } else if (sub == "uninstall") {
       r = platform::uninstall_service();
