@@ -119,7 +119,9 @@ Nothing in this repository has been run on a real NVIDIA GPU. The development en
 - The whole pipeline (discovery, benchmark, stress verdicts, tuning search across 24 seeds, non-monotonic re-tests, voltage, power and fan stages, validation back-off, budget cap, crash-and-resume, the controller state machine, the runtime monitor, cooldown and disablement, service stop and preshutdown, the watchdog, profiles, auto-switching, and the CLI) against the mock backend with a simulated clock.
 - The Vulkan compute kernel is bit-exact against its CPU reference on a software Vulkan driver (Mesa lavapipe), both in-process and through `gpuoc-worker`.
 - Windows code paths, built with MinGW-w64 and run under Wine: `CreateProcessW` with job objects and handle-list inheritance, crash, hang and exit detection of the worker, named-pipe JSON-RPC, `%ProgramData%`/`%APPDATA%` resolution, death tests for crash recovery and the watchdog.
-- MSVC and clang-cl builds and the full test suite on GitHub Actions (`windows-latest`, `windows-2022`).
+- MSVC (Visual Studio 2022 with the exact definition-of-done commands, and the Visual Studio shipped on `windows-latest`) and clang-cl builds, with the full test suite passing on GitHub Actions Windows runners. That includes the crash-recovery and watchdog death tests, NTSTATUS crash detection of the worker, named-pipe anti-squatting, and the CLI integration tests.
+- The real service under the real Service Control Manager, on the simulated GPU in dry-run mode: install, start, `list` and `set` over `\\.\pipe\gpuoc` as an elevated client, refusal of an out-of-range value (exit 3), stop with stock restored before `SERVICE_STOPPED`, and uninstall (`tools/ci-service-smoke.ps1`).
+- The Windows Event Log query runs and reads the System log on a real Windows machine (on CI, with no NVIDIA driver, so no NVIDIA events).
 - NVML and NVAPI status-code parsing, capability derivation, unit conversion, the fan-curve floor, PCI-bus mapping between NVML and NVAPI, and stock reset, all against fake function tables.
 
 **Unverified on hardware:**
