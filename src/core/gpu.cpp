@@ -205,7 +205,11 @@ Result<void> StockGuard::restore() {
   // Fallback: write the snapshot explicitly.
   if (stock_) {
     log::warn("[{}] reset_to_stock failed ({}); writing stock snapshot", gpu_->id().uuid, r.error().message);
-    if (auto a = gpu_->apply(*stock_, ClampMode::Clamp)) return success();
+    Settings snapshot = *stock_;
+    // Without the voltage gate a voltage write is refused; reset_to_stock
+    // already covers voltage on the driver side.
+    if (!gpu_->policy().config().allow_voltage) snapshot.voltage_mv.reset();
+    if (auto a = gpu_->apply(snapshot, ClampMode::Clamp)) return success();
   }
   return r;
 }
