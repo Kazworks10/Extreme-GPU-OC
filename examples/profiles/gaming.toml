@@ -1,0 +1,21 @@
+# A fixed overclock applied when a game starts. Fixed profiles that raise
+# clocks above stock are unvalidated, so they are applied only by an explicit
+# `gpuoc profile apply gaming`; automatic switching applies validated (auto)
+# or conservative profiles only.
+name = "gaming"
+description = "Validated max-performance tune while games run"
+objective = "max_performance"
+priority = 10
+
+[target]
+mode = "auto"           # use the validated settings tuned for max_performance
+temp_target_c = 72      # tighter than the global target while gaming
+
+[tuning]
+budget_s = 7200
+
+[[match]]
+exe = "*game*.exe"
+
+[[match]]
+path = "C:\\Games\\Example\\example.exe"

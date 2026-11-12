@@ -37,7 +37,8 @@ TEST(Hardware, TelemetryIsPlausible) {
   GPUOC_REQUIRE_HW();
   auto b = make_nvidia_backend();
   ASSERT_TRUE(b.ok()) << b.error().message;
-  for (const auto& id : b.value()->enumerate().value()) {
+  const auto ids = b.value()->enumerate().value();
+  for (const auto& id : ids) {
     auto t = b.value()->read_telemetry(id);
     ASSERT_TRUE(t.ok()) << t.error().message;
     EXPECT_GT(t.value().temp_c, 5);
@@ -69,7 +70,8 @@ TEST(Hardware, VulkanUuidMatchesNvml) {
   ASSERT_TRUE(b.ok());
   auto devs = VulkanKernel::list_devices();
   ASSERT_TRUE(devs.ok()) << devs.error().message;
-  for (const auto& id : b.value()->enumerate().value()) {
+  const auto ids = b.value()->enumerate().value();
+  for (const auto& id : ids) {
     bool found = false;
     for (const auto& d : devs.value()) found |= d.uuid == id.uuid;
     EXPECT_TRUE(found) << "no Vulkan device with NVML UUID " << id.uuid;

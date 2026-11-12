@@ -1,0 +1,67 @@
+# Extreme GPU OC configuration.
+# Default location: %ProgramData%\ExtremeGpuOc\gpuoc.toml (override with --config).
+# Every key is optional; unknown keys are errors so a typo cannot be ignored.
+# Values beyond the hard limits in code are tightened, never loosened.
+
+[autotune]
+# Autonomous tuning runs only when BOTH autotune.enabled and
+# safety.acknowledge_risk are true. Otherwise the service is monitor-only.
+enabled = false
+objective = "max_perf_per_watt"   # max_performance | max_perf_per_watt | balanced
+budget_s = 14400                  # 4 h cap; the best validated result is kept
+revalidate_days = 14
+
+[safety]
+# Overclocking can crash the system, corrupt data, and shorten hardware life.
+acknowledge_risk = false
+allow_voltage = false             # voltage changes also need driver support
+allow_power_above_stock = false   # power limit above stock TDP
+max_temp_c = 83                   # revert threshold; hard ceiling 90
+target_temp_c = 75                # hysteresis target
+# max_power_w = 300               # default: stock TDP (or driver max if allowed above stock)
+# max_voltage_mv = 1050           # can only lower the ceiling (driver max - one step)
+# max_core_offset_mhz = 200
+# max_mem_offset_mhz = 1500
+min_fan_pct_hot = 30              # never below 30% above 60 C (can only be raised)
+
+[tuning]
+core_step_mhz = 15
+mem_step_mhz = 50
+margin_steps = 1
+short_stress_s = 120
+long_stress_s = 1800
+validation_retries = 3
+boundary_lookahead = true
+max_retest_rounds = 2
+power_step_w = 10
+max_power_steps = 5
+tune_fan = true
+hang_timeout_s = 30
+
+[benchmark]
+warmup_s = 30
+runs = 3
+run_s = 10
+max_cv_pct = 3.0
+invalid_on_power_cap = false
+workload = "builtin"              # builtin | external
+# external_command = "C:\\Bench\\bench.exe --quick"
+# external_score_regex = "score:\\s*([0-9.]+)"
+# external_unit = "fps"
+external_timeout_s = 600
+
+[monitor]
+poll_interval_ms = 1000
+cooldown_s = 1800
+hysteresis_hold_s = 60
+hysteresis_delta_c = 5.0
+max_violations_24h = 3
+instability_retune_threshold = 2
+
+[profiles]
+default = ""                      # empty: automatic (tuned for autotune.objective)
+auto_switch = true
+poll_interval_ms = 2000
+
+[service]
+watchdog_timeout_s = 120

@@ -77,7 +77,9 @@ class [[nodiscard]] Result {
     if (!ok()) detail::bad_result_access(std::get<1>(v_));
     return std::get<0>(v_);
   }
-  [[nodiscard]] T&& value() && {
+  // By value, so `for (auto& x : f().value())` and similar uses of a
+  // temporary Result never leave a dangling reference.
+  [[nodiscard]] T value() && {
     if (!ok()) detail::bad_result_access(std::get<1>(v_));
     return std::get<0>(std::move(v_));
   }

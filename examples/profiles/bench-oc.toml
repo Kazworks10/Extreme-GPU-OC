@@ -1,0 +1,14 @@
+# A fixed overclock with a per-GPU override. Limits are still enforced:
+# values outside the effective range are rejected, never clamped.
+name = "bench-oc"
+description = "Manual overclock for benchmarking (apply explicitly)"
+objective = "max_performance"
+
+[target]
+mode = "fixed"
+core_offset_mhz = 90
+mem_offset_mhz = 500
+power_limit_pct = 100
+
+[gpu."GPU-00000000-0000-4000-8000-0000000f4243"]
+core_offset_mhz = 75

@@ -41,7 +41,9 @@ Result<void> ProfileStore::load() {
         errors.push_back(where + ": the built-in 'stock' profile cannot be overridden");
         continue;
       }
-      by_name[p.value().name] = std::move(p).value();
+      Profile parsed = std::move(p).value();
+      const std::string key = parsed.name;
+      by_name[key] = std::move(parsed);
     }
   }
   for (const auto& e : errors) log::warn("profile: {}", e);

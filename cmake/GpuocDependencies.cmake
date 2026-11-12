@@ -78,3 +78,20 @@ target_compile_definitions(gpuoc_toml INTERFACE TOML_EXCEPTIONS=0)
 
 add_library(gpuoc_json INTERFACE)
 target_include_directories(gpuoc_json SYSTEM INTERFACE "${nlohmann_json_SOURCE_DIR}/include")
+
+# GoogleTest builds with its own warning flags (including /WX under MSVC-like
+# drivers). Keep its headers out of our warning set, and silence warnings
+# that newer clang-cl releases add to its own sources.
+if(GPUOC_BUILD_TESTS)
+  foreach(_t gtest gtest_main)
+    if(TARGET ${_t})
+      get_target_property(_inc ${_t} INTERFACE_INCLUDE_DIRECTORIES)
+      if(_inc)
+        set_target_properties(${_t} PROPERTIES INTERFACE_SYSTEM_INCLUDE_DIRECTORIES "${_inc}")
+      endif()
+      if(MSVC AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        target_compile_options(${_t} PRIVATE /clang:-Wno-unknown-warning-option /clang:-Wno-character-conversion)
+      endif()
+    endif()
+  endforeach()
+endif()

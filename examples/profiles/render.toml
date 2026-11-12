@@ -1,0 +1,17 @@
+# A conservative profile for long renders: lower power, cooler, quieter.
+# Conservative settings (no clock, power or voltage above stock) may be
+# applied automatically by process matching.
+name = "render"
+description = "Long renders: 85% power, stock clocks, firmer fan curve"
+objective = "max_perf_per_watt"
+priority = 20
+
+[target]
+mode = "fixed"
+core_offset_mhz = 0
+mem_offset_mhz = 0
+power_limit_pct = 85
+fan_curve = [[40, 35], [60, 50], [70, 70], [80, 100]]
+
+[[match]]
+exe = "blender*.exe"
